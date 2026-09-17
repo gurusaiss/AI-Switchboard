@@ -18,7 +18,7 @@ export const SEED_MODELS: ModelInfo[] = [
     pricingInputPer1k: 0,
     pricingOutputPer1k: 0,
     typicalLatencyMs: 300,
-    reliabilityScore: 0.99,
+    reliabilityScore: 0.92,
     isLocal: true,
   },
   {
@@ -32,7 +32,7 @@ export const SEED_MODELS: ModelInfo[] = [
     pricingInputPer1k: 0,
     pricingOutputPer1k: 0,
     typicalLatencyMs: 1500,
-    reliabilityScore: 0.97,
+    reliabilityScore: 0.98,
     isLocal: true,
   },
   {
