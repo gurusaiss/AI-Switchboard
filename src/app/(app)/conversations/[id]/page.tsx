@@ -42,11 +42,11 @@ export default function ConversationDetailPage() {
       });
   }, [authChecked, params.id]);
 
-  if (!authChecked) return <p className="text-sm text-gray-500">Loading...</p>;
+  if (!authChecked) return <p className="text-sm text-muted">Loading...</p>;
   if (notFound) {
     return (
       <div>
-        <p className="text-sm text-gray-500">Conversation not found.</p>
+        <p className="text-sm text-muted">Conversation not found.</p>
         <Link href="/conversations" className="text-sm text-brand-600 hover:underline">
           Back to history
         </Link>
@@ -65,16 +65,16 @@ export default function ConversationDetailPage() {
           <div
             key={m.id}
             className={`rounded-lg border p-3 text-sm ${
-              m.role === 'user' ? 'border-gray-200 bg-white' : 'border-brand-100 bg-brand-50'
+              m.role === 'user' ? 'border-border bg-surface' : 'border-brand-100 bg-brand-50'
             }`}
           >
-            <div className="mb-1 flex items-center gap-2 text-xs text-gray-500">
+            <div className="mb-1 flex items-center gap-2 text-xs text-muted">
               <span className="font-medium uppercase">{m.role}</span>
               {m.modelId && <span>· {m.modelId}</span>}
               {m.role === 'assistant' && (
                 <span
                   className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${
-                    m.isDemo ? 'bg-amber-100 text-amber-800' : 'bg-green-100 text-green-800'
+                    m.isDemo ? 'bg-warning-bg text-warning-text' : 'bg-success-bg text-success-text'
                   }`}
                 >
                   {m.isDemo ? 'DEMO / MOCK' : 'REAL PROVIDER'}

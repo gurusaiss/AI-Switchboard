@@ -80,32 +80,41 @@ export default function ProvidersPage() {
     refresh();
   }
 
-  if (!authChecked) return <p className="text-sm text-gray-500">Loading...</p>;
+  if (!authChecked) {
+    return (
+      <div className="space-y-4">
+        <div className="h-7 w-32 animate-pulse rounded bg-surface" />
+        <div className="h-24 animate-pulse rounded-lg bg-surface" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-semibold">Providers</h1>
-        <p className="text-sm text-gray-500">
+        <h1 className="text-2xl font-semibold text-ink">Providers</h1>
+        <p className="text-sm text-muted">
           Bring your own key. Nothing is required to get started - the Mock provider is always available.
         </p>
       </div>
 
       <div>
-        <h2 className="mb-2 text-sm font-medium text-gray-700">Connected</h2>
+        <h2 className="mb-2 text-sm font-medium text-ink">Connected</h2>
         {connected.length === 0 ? (
-          <p className="text-sm text-gray-400">No providers connected yet. Mock is always usable below.</p>
+          <p className="rounded-lg border border-dashed border-border bg-surface p-4 text-sm text-faint">
+            No providers connected yet. Mock is always usable below.
+          </p>
         ) : (
           <ul className="space-y-2">
             {connected.map((c) => (
-              <li key={c.id} className="flex items-center justify-between rounded border border-gray-200 bg-white p-3 text-sm">
+              <li key={c.id} className="flex items-center justify-between rounded border border-border bg-surface p-3 text-sm">
                 <div>
                   <span className="font-medium">{c.provider}</span>{' '}
-                  <span className="text-gray-400">({c.discoveredModels.length} models)</span>
+                  <span className="text-faint">({c.discoveredModels.length} models)</span>
                 </div>
                 <button
                   onClick={() => handleDisconnect(c.id)}
-                  className="rounded border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  className="rounded border border-danger-bg px-2 py-1 text-xs text-danger-text hover:bg-danger-bg"
                 >
                   Disconnect
                 </button>
@@ -116,15 +125,15 @@ export default function ProvidersPage() {
       </div>
 
       <div className="space-y-4">
-        <h2 className="text-sm font-medium text-gray-700">Connect a provider</h2>
+        <h2 className="text-sm font-medium text-ink">Connect a provider</h2>
         {CONNECTABLE.map((p) => {
           const isConnected = connected.some((c) => c.provider === p.key);
           const msg = messages[p.key];
           return (
-            <div key={p.key} className="rounded border border-gray-200 bg-white p-4">
+            <div key={p.key} className="rounded border border-border bg-surface p-4">
               <div className="mb-2 flex items-center justify-between">
                 <span className="text-sm font-medium">{p.label}</span>
-                {isConnected && <span className="text-xs text-green-700">Connected</span>}
+                {isConnected && <span className="text-xs text-success-text">Connected</span>}
               </div>
               {p.needsKey ? (
                 <div className="flex gap-2">
@@ -133,7 +142,7 @@ export default function ProvidersPage() {
                     placeholder={`${p.label} API key`}
                     value={keyInputs[p.key] || ''}
                     onChange={(e) => setKeyInputs((k) => ({ ...k, [p.key]: e.target.value }))}
-                    className="flex-1 rounded border border-gray-300 px-2 py-1.5 text-sm"
+                    className="flex-1 rounded border border-border px-2 py-1.5 text-sm"
                   />
                   <button
                     onClick={() => handleConnect(p.key, true)}
@@ -153,7 +162,7 @@ export default function ProvidersPage() {
                 </button>
               )}
               {msg && (
-                <p className={`mt-2 text-xs ${msg.ok ? 'text-green-700' : 'text-red-600'}`}>{msg.text}</p>
+                <p className={`mt-2 text-xs ${msg.ok ? 'text-success-text' : 'text-danger-text'}`}>{msg.text}</p>
               )}
             </div>
           );

@@ -31,29 +31,39 @@ export default function ConversationsPage() {
       .then((body) => setConversations(body.conversations));
   }, [authChecked]);
 
-  if (!authChecked) return <p className="text-sm text-gray-500">Loading...</p>;
+  if (!authChecked) {
+    return (
+      <div className="space-y-4">
+        <div className="h-7 w-48 animate-pulse rounded bg-surface" />
+        <div className="h-32 animate-pulse rounded-lg bg-surface" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">
-      <h1 className="text-2xl font-semibold">Conversation history</h1>
+      <h1 className="text-2xl font-semibold text-ink">Conversation history</h1>
       {conversations.length === 0 ? (
-        <p className="text-sm text-gray-400">
-          No conversations yet. Head to the{' '}
-          <Link href="/" className="text-brand-600 hover:underline">
-            Composer
-          </Link>{' '}
-          to start one.
-        </p>
+        <div className="rounded-lg border border-dashed border-border bg-surface p-8 text-center">
+          <p className="text-sm text-muted">No conversations yet.</p>
+          <p className="mt-1 text-sm text-faint">
+            Head to the{' '}
+            <Link href="/app" className="text-brand-600 hover:underline">
+              Composer
+            </Link>{' '}
+            to start one.
+          </p>
+        </div>
       ) : (
-        <ul className="divide-y divide-gray-200 rounded border border-gray-200 bg-white">
+        <ul className="divide-y divide-border rounded-lg border border-border bg-surface shadow-card">
           {conversations
             .slice()
             .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
             .map((c) => (
               <li key={c.id}>
-                <Link href={`/conversations/${c.id}`} className="block px-4 py-3 text-sm hover:bg-gray-50">
-                  <div className="font-medium">{c.title}</div>
-                  <div className="text-xs text-gray-400">{new Date(c.createdAt).toLocaleString()}</div>
+                <Link href={`/conversations/${c.id}`} className="block px-4 py-3 text-sm hover:bg-bg">
+                  <div className="font-medium text-ink">{c.title}</div>
+                  <div className="text-xs text-faint">{new Date(c.createdAt).toLocaleString()}</div>
                 </Link>
               </li>
             ))}
