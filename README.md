@@ -13,6 +13,24 @@ This is V1 of a larger roadmap. Out of scope for V1 (see "What's not built yet"
 below): RAG, MCP, multi-step agents/workflows, evaluations, and multi-tenant
 teams. Those are V2+.
 
+## Pages
+
+| Route | Purpose |
+| --- | --- |
+| `/` | Public marketing landing page (logged-out visitors land here). Describes what's actually built - no fake logos, testimonials, or stats. |
+| `/pricing` | Free / Pro / Team / Enterprise tiers. Only Free is wired to real signup; Pro/Team/Enterprise are "coming" and their CTAs open a `mailto:` link, not a fake checkout. |
+| `/login`, `/signup` | Auth. |
+| `/app` | The universal composer (this used to be `/` in earlier builds - moved so a real marketing page could live at the root). Auto/Quality/Speed/Cost/Privacy/Manual routing, "why this model?" trace, and Compare mode. |
+| `/providers` | Connect/disconnect BYOK provider keys, or detect a local Ollama server. |
+| `/conversations`, `/conversations/[id]` | Conversation history. |
+| `/usage` | Per-model usage, cost, latency, and the estimated-savings-from-routing metric (see below). |
+
+Route layout: `/` and `/pricing` live under the `(marketing)` route group with
+their own header/footer; `/app`, `/providers`, `/conversations`, and `/usage`
+live under `(app)` with the authenticated nav bar. Auth redirects are
+client-side: each app page checks `/api/auth/me` and pushes to `/login` if
+unauthenticated; `/login` and `/signup` push to `/app` on success.
+
 ## Architecture summary
 
 ```
@@ -51,6 +69,14 @@ composer input
   scoring, execution, output validation, and bounded fallback all live here,
   independent of the DB and HTTP layers, so it's directly unit-testable
   against Mock with no database at all.
+- **Cost-savings computation** (`src/lib/costBenchmark.ts`): on every executed
+  request, alongside the real cost of the model actually used, the server also
+  computes what the same request (same input/output token counts) would have
+  cost at the most expensive model in the whole registry that still satisfies
+  the request's detected capabilities. Both numbers are stored per usage event
+  (`usage_events.est_cost` and `usage_events.benchmark_cost`), and `/usage`
+  sums the delta as "Estimated savings from routing" - a real computation over
+  real rows, $0 for a workspace with no usage, never a placeholder.
 - **Data layer** (`src/db/`): Drizzle ORM over SQLite (`better-sqlite3`) for
   zero-infrastructure local dev. The schema deliberately avoids SQLite-only
   tricks (text uuid-shaped ids, integer unix-ms timestamps, integer 0/1
@@ -97,6 +123,19 @@ composer input
 Next.js 14 (App Router) + TypeScript + Tailwind CSS, Drizzle ORM over SQLite
 (`better-sqlite3`), bcrypt + `iron-session` for auth, Vitest for tests.
 
+## Design system
+
+Colors, surfaces, and text tones are defined once as CSS custom properties in
+`src/app/globals.css` (`--color-bg`, `--color-surface`, `--color-border`,
+`--color-text*`, `--color-brand-*`, `--color-success/warning/danger-*`), with
+a dark-mode variant that applies automatically via
+`prefers-color-scheme: dark` (or can be forced with `data-theme="dark"` /
+`"light"` on `<html>`). `tailwind.config.ts` exposes these as Tailwind color
+utilities (`bg-surface`, `text-ink`, `text-muted`, `border-border`, etc.) plus
+a slightly more deliberate type scale, so the landing page, pricing page, and
+every app page (composer, providers, conversations, usage) share one visual
+language instead of one-off hex values.
+
 ## Setup
 
 ```bash
@@ -116,9 +155,11 @@ npm run dev
 # -> http://localhost:3000
 ```
 
-Sign up with any email/password (min 8 characters) - no provider key is
-required. The Mock provider is always available, so the Composer, Compare,
-history, and usage dashboard all work immediately for a brand-new user.
+Visit `http://localhost:3000` for the public landing page, or go straight to
+`/signup`. Sign up with any email/password (min 8 characters) - no provider
+key is required. The Mock provider is always available, so the Composer
+(`/app`), Compare, history, and usage dashboard all work immediately for a
+brand-new user.
 
 ### Connecting a real provider
 
@@ -187,17 +228,21 @@ npm start
 
 ## What's built vs. what's not (V1 scope)
 
-**Built**: universal composer with Auto/Quality/Speed/Cost/Privacy/Manual
-routing modes and a Compare mode; a real, data-driven model registry (16
-seed models across Mock/OpenAI/Anthropic/Google/OpenRouter/Ollama) with a
-reliability-score update hook; a rule-based task classifier with a
-deterministic fallback so it can never crash the pipeline; capability + context-
-window filtering; weighted-sum scoring with visible per-candidate scores;
-bounded fallback across candidates on failure; output validation (empty-
-response, code-bracket-balance, JSON-parse checks); envelope-encrypted BYOK
-storage; workspace-scoped data access; full CRUD-ish API surface for
+**Built**: a public marketing landing page and pricing page; universal
+composer (`/app`) with Auto/Quality/Speed/Cost/Privacy/Manual routing modes
+and a Compare mode; a real, data-driven model registry (16 seed models across
+Mock/OpenAI/Anthropic/Google/OpenRouter/Ollama) with a reliability-score
+update hook; a rule-based task classifier with a deterministic fallback so it
+can never crash the pipeline; capability + context-window filtering;
+weighted-sum scoring with visible per-candidate scores (shown as score bars
+in the explainability trace, plus a latency/cost comparison view in Compare
+mode); bounded fallback across candidates on failure; output validation
+(empty-response, code-bracket-balance, JSON-parse checks); envelope-encrypted
+BYOK storage; workspace-scoped data access; a real "estimated savings from
+routing" computation on the usage dashboard; full CRUD-ish API surface for
 providers/models/execute/compare/conversations/usage; a working UI for all of
-the above that never dead-ends with zero providers connected.
+the above (with loading and empty states) that never dead-ends with zero
+providers connected; a shared design-token system with light/dark support.
 
 **Not built (by design, V2+)**: RAG/document retrieval, MCP tool integration,
 multi-step agentic workflows, an evaluation/scoring harness for comparing
