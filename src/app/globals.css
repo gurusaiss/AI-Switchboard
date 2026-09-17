@@ -1,3 +1,107 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Design tokens. Defined once here as CSS custom properties so both Tailwind
+ * (via tailwind.config.ts, which reads these variables) and any plain CSS can
+ * share one source of truth. Light values are the default; dark values apply
+ * automatically by OS preference, and can be forced with [data-theme="dark"]
+ * or [data-theme="light"] on <html>.
+ */
+:root {
+  --color-bg: 250 250 252;
+  --color-surface: 255 255 255;
+  --color-surface-raised: 255 255 255;
+  --color-border: 228 228 235;
+  --color-text: 23 23 30;
+  --color-text-muted: 100 100 115;
+  --color-text-faint: 148 148 163;
+
+  --color-brand-50: 240 245 255;
+  --color-brand-100: 219 230 255;
+  --color-brand-400: 92 122 255;
+  --color-brand-500: 59 91 253;
+  --color-brand-600: 47 71 214;
+  --color-brand-700: 37 54 168;
+
+  --color-success-bg: 220 245 230;
+  --color-success-text: 21 110 65;
+  --color-warning-bg: 255 240 210;
+  --color-warning-text: 140 95 15;
+  --color-danger-bg: 255 228 228;
+  --color-danger-text: 180 35 35;
+
+  --font-sans: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --color-bg: 13 13 17;
+    --color-surface: 21 21 27;
+    --color-surface-raised: 27 27 34;
+    --color-border: 45 45 55;
+    --color-text: 237 237 242;
+    --color-text-muted: 168 168 180;
+    --color-text-faint: 118 118 132;
+
+    --color-brand-50: 26 29 48;
+    --color-brand-100: 34 39 66;
+    --color-brand-400: 108 136 255;
+    --color-brand-500: 124 150 255;
+    --color-brand-600: 150 170 255;
+    --color-brand-700: 180 196 255;
+
+    --color-success-bg: 20 46 34;
+    --color-success-text: 118 214 160;
+    --color-warning-bg: 56 42 12;
+    --color-warning-text: 235 185 90;
+    --color-danger-bg: 55 22 22;
+    --color-danger-text: 250 130 130;
+  }
+}
+
+:root[data-theme='dark'] {
+  --color-bg: 13 13 17;
+  --color-surface: 21 21 27;
+  --color-surface-raised: 27 27 34;
+  --color-border: 45 45 55;
+  --color-text: 237 237 242;
+  --color-text-muted: 168 168 180;
+  --color-text-faint: 118 118 132;
+
+  --color-brand-50: 26 29 48;
+  --color-brand-100: 34 39 66;
+  --color-brand-400: 108 136 255;
+  --color-brand-500: 124 150 255;
+  --color-brand-600: 150 170 255;
+  --color-brand-700: 180 196 255;
+
+  --color-success-bg: 20 46 34;
+  --color-success-text: 118 214 160;
+  --color-warning-bg: 56 42 12;
+  --color-warning-text: 235 185 90;
+  --color-danger-bg: 55 22 22;
+  --color-danger-text: 250 130 130;
+}
+
+body {
+  background-color: rgb(var(--color-bg));
+  color: rgb(var(--color-text));
+  font-family: var(--font-sans);
+}
+
+/* Small utility for a subtle score/confidence bar used in the composer's
+   explainability trace and compare mode. Kept in plain CSS since it's a
+   fixed-purpose visual, not a reusable Tailwind pattern. */
+.score-bar-track {
+  height: 6px;
+  border-radius: 9999px;
+  background-color: rgb(var(--color-border));
+  overflow: hidden;
+}
+.score-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+  background-color: rgb(var(--color-brand-500));
+}
