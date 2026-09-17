@@ -121,6 +121,11 @@ export const usageEvents = sqliteTable('usage_events', {
   provider: text('provider').notNull(),
   latencyMs: integer('latency_ms').notNull(),
   estCost: real('est_cost').notNull(),
+  // What the same request (same token usage) would have cost at the most expensive
+  // model in the registry that still satisfies the request's detected capabilities.
+  // Computed once at request time in /api/execute from real registry pricing data;
+  // 0 when no token usage was reported (e.g. an adapter that doesn't return usage).
+  benchmarkCost: real('benchmark_cost').notNull().default(0),
   success: integer('success', { mode: 'boolean' }).notNull(),
   isDemo: integer('is_demo', { mode: 'boolean' }).notNull().default(false),
   createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),

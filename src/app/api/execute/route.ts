@@ -8,6 +8,7 @@ import { runPipeline, NoCandidatesError, AllCandidatesFailedError } from '../../
 import { newId } from '../../../lib/ids';
 import { jsonError, withErrorHandling } from '../../../lib/api-helpers';
 import { safeLog } from '../../../lib/redact';
+import { benchmarkCostFor } from '../../../lib/costBenchmark';
 
 const bodySchema = z.object({
   prompt: z.string().min(1),
@@ -89,6 +90,7 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
     provider: response.provider,
     latencyMs: response.latencyMs,
     estCost: response.estCost,
+    benchmarkCost: benchmarkCostFor(registry, trace.detectedRequirements.capabilities, response),
     success: true,
     isDemo: response.isDemo,
     createdAt: new Date(),

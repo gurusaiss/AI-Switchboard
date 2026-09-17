@@ -1,0 +1,1 @@
+ALTER TABLE `usage_events` ADD `benchmark_cost` real DEFAULT 0 NOT NULL;

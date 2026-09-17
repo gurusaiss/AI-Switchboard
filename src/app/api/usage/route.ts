@@ -18,6 +18,8 @@ export const GET = withErrorHandling(async () => {
   const events = await scopedQueries(workspaceId).listUsageEvents();
 
   const byModel = new Map<string, Aggregate & { latencySum: number }>();
+  let totalActualCost = 0;
+  let totalBenchmarkCost = 0;
   for (const e of events) {
     const key = e.modelId;
     let agg = byModel.get(key);
@@ -38,6 +40,8 @@ export const GET = withErrorHandling(async () => {
     if (e.success) agg.successCount += 1;
     agg.totalCost += e.estCost;
     agg.latencySum += e.latencyMs;
+    totalActualCost += e.estCost;
+    totalBenchmarkCost += e.benchmarkCost;
   }
 
   const aggregates: Aggregate[] = Array.from(byModel.values()).map((a) => ({
@@ -50,5 +54,16 @@ export const GET = withErrorHandling(async () => {
     successRate: Number((a.successCount / a.totalCalls).toFixed(4)),
   }));
 
-  return NextResponse.json({ aggregates, totalEvents: events.length });
+  // Real computation over real rows: what routing actually spent vs. what the same
+  // requests (same token usage) would have cost at the most expensive capable model
+  // in the registry. 0 for a fresh workspace with no usage - never a placeholder.
+  const estimatedSavings = Number(Math.max(0, totalBenchmarkCost - totalActualCost).toFixed(6));
+
+  return NextResponse.json({
+    aggregates,
+    totalEvents: events.length,
+    estimatedSavings,
+    totalActualCost: Number(totalActualCost.toFixed(6)),
+    totalBenchmarkCost: Number(totalBenchmarkCost.toFixed(6)),
+  });
 });
