@@ -9,6 +9,7 @@ interface ConnectedProvider {
   label: string | null;
   discoveredModels: string[];
   createdAt: string;
+  lastVerifiedAt: string;
 }
 
 const CONNECTABLE = [
@@ -64,7 +65,7 @@ export default function ProvidersPage() {
         ...m,
         [provider]: {
           ok: true,
-          text: `Connected. Discovered ${body.discoveredModels.length} model(s).`,
+          text: `${body.rotated ? 'Key rotated' : 'Connected'}. Discovered ${body.discoveredModels.length} model(s).`,
           models: body.discoveredModels.map((mo: { displayName: string }) => mo.displayName),
         },
       }));
@@ -111,6 +112,9 @@ export default function ProvidersPage() {
                 <div>
                   <span className="font-medium">{c.provider}</span>{' '}
                   <span className="text-faint">({c.discoveredModels.length} models)</span>
+                  <div className="text-xs text-faint">
+                    Last verified {new Date(c.lastVerifiedAt).toLocaleString()}
+                  </div>
                 </div>
                 <button
                   onClick={() => handleDisconnect(c.id)}
@@ -139,7 +143,7 @@ export default function ProvidersPage() {
                 <div className="flex gap-2">
                   <input
                     type="password"
-                    placeholder={`${p.label} API key`}
+                    placeholder={isConnected ? `New ${p.label} API key` : `${p.label} API key`}
                     value={keyInputs[p.key] || ''}
                     onChange={(e) => setKeyInputs((k) => ({ ...k, [p.key]: e.target.value }))}
                     className="flex-1 rounded border border-border px-2 py-1.5 text-sm"
@@ -149,7 +153,7 @@ export default function ProvidersPage() {
                     disabled={busy === p.key || !keyInputs[p.key]}
                     className="rounded bg-brand-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-brand-700 disabled:opacity-60"
                   >
-                    {busy === p.key ? 'Connecting...' : 'Connect'}
+                    {busy === p.key ? 'Connecting...' : isConnected ? 'Rotate key' : 'Connect'}
                   </button>
                 </div>
               ) : (

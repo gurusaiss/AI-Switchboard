@@ -11,17 +11,28 @@ export interface ConnectedProviderSummary {
   label: string | null;
   discoveredModels: string[];
   createdAt: Date;
+  /** When this key was last (re)verified against the provider - the initial
+   * connect, or the most recent rotation. */
+  lastVerifiedAt: Date;
   // Deliberately no key material of any kind.
 }
 
-/** Connects a provider for a workspace: encrypts + stores the key (or, for Ollama,
- * confirms a local server is reachable), and returns discovered models. The raw
- * API key exists in memory only for the duration of this call. */
+/** Connects (or, if a credential already exists for this provider, rotates)
+ * a provider for a workspace: encrypts + stores the key (or, for Ollama,
+ * confirms a local server is reachable), and returns discovered models. The
+ * raw API key exists in memory only for the duration of this call.
+ *
+ * Rotation replaces the key material in place (same credential id, original
+ * createdAt preserved as "first connected") rather than delete+reinsert, so
+ * the old key is verifiably gone from storage the moment this returns, and a
+ * "last verified" timestamp can be shown without losing the original connect
+ * date. The plaintext key is never returned, on either the initial connect or
+ * a rotation. */
 export async function connectProvider(
   workspaceId: string,
   provider: ProviderName,
   apiKey: string | undefined
-): Promise<{ id: string; discoveredModels: ModelInfo[] }> {
+): Promise<{ id: string; discoveredModels: ModelInfo[]; rotated: boolean }> {
   const adapter = getAdapter(provider);
 
   // This call may throw (bad key, unreachable Ollama, network error) - callers
@@ -29,7 +40,6 @@ export async function connectProvider(
   const discoveredModels = await adapter.listModels(apiKey);
 
   const queries = scopedQueries(workspaceId);
-  const id = newId('cred');
 
   let encryptedBlob = '';
   if (apiKey) {
@@ -38,22 +48,32 @@ export async function connectProvider(
     // dek is a local Buffer; no reference is retained beyond this scope.
   }
 
-  // Replace any existing credential for this provider (re-connect / rotate key).
+  const now = new Date();
   const existing = await queries.getProviderCredentialByProvider(provider);
+
   if (existing) {
-    await queries.deleteProviderCredential(existing.id);
+    // Rotate in place: same id, new key material, new lastVerifiedAt. The old
+    // ciphertext is overwritten - never retained anywhere.
+    await queries.updateProviderCredential(existing.id, {
+      encrypted: encryptedBlob,
+      discoveredModels: discoveredModels.map((m) => m.id),
+      lastVerifiedAt: now,
+    });
+    return { id: existing.id, discoveredModels, rotated: true };
   }
 
+  const id = newId('cred');
   await queries.insertProviderCredential({
     id,
     provider,
     encrypted: encryptedBlob,
     label: provider === 'ollama' ? 'local' : null,
     discoveredModels: discoveredModels.map((m) => m.id),
-    createdAt: new Date(),
+    createdAt: now,
+    lastVerifiedAt: now,
   });
 
-  return { id, discoveredModels };
+  return { id, discoveredModels, rotated: false };
 }
 
 export async function listConnectedProviders(workspaceId: string): Promise<ConnectedProviderSummary[]> {
@@ -64,6 +84,7 @@ export async function listConnectedProviders(workspaceId: string): Promise<Conne
     label: r.label,
     discoveredModels: r.discoveredModels ?? [],
     createdAt: r.createdAt,
+    lastVerifiedAt: r.lastVerifiedAt,
   }));
 }
 

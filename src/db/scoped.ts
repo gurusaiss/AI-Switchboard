@@ -41,6 +41,17 @@ export function scopedQueries(workspaceId: string) {
     insertProviderCredential: (values: Omit<typeof providerCredentials.$inferInsert, 'workspaceId'>) =>
       db.insert(providerCredentials).values({ ...values, workspaceId }),
 
+    /** Rotates a credential in place: same id (and original createdAt), new
+     * encrypted key material + discoveredModels + lastVerifiedAt. */
+    updateProviderCredential: (
+      id: string,
+      values: Partial<Omit<typeof providerCredentials.$inferInsert, 'id' | 'workspaceId' | 'createdAt'>>
+    ) =>
+      db
+        .update(providerCredentials)
+        .set(values)
+        .where(and(eq(providerCredentials.id, id), eq(providerCredentials.workspaceId, workspaceId))),
+
     deleteProviderCredential: (id: string) =>
       db
         .delete(providerCredentials)

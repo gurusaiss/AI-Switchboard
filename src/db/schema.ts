@@ -52,7 +52,10 @@ export const providerCredentials = sqliteTable('provider_credentials', {
   encrypted: text('encrypted').notNull(), // JSON-packed EncryptedPayload of the API key
   label: text('label'), // optional human label, e.g. "personal key"
   discoveredModels: text('discovered_models', { mode: 'json' }).$type<string[]>(),
-  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(),
+  createdAt: integer('created_at', { mode: 'timestamp_ms' }).notNull(), // first connected
+  // Updated every time the key is (re)verified against the provider: on the
+  // initial connect, and again on every rotation (replacing the key in place).
+  lastVerifiedAt: integer('last_verified_at', { mode: 'timestamp_ms' }).notNull(),
 });
 
 // Model registry - seed data, not hardcoded routing logic. Adding a model means
