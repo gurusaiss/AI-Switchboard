@@ -22,7 +22,7 @@ export function sessionOptions(): SessionOptions {
 }
 
 export async function getSession(): Promise<IronSession<SessionData>> {
-  return getIronSession<SessionData>(cookies(), sessionOptions());
+  return getIronSession<SessionData>(await cookies(), sessionOptions());
 }
 
 export async function hashPassword(password: string): Promise<string> {
