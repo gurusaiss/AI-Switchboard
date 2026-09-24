@@ -78,6 +78,25 @@ describe('CSRF protection on state-changing routes', () => {
     expect(res.status).toBe(403);
   });
 
+  it('rejects a cross-site POST to logout (using a real, authenticated session)', async () => {
+    const jar = new CookieJar();
+    await apiFetch(jar, '/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email: uniqueEmail('csrf-logout'), password: 'correcthorsebatterystaple' }),
+    });
+
+    const res = await fetch(`${BASE_URL}/api/auth/logout`, {
+      method: 'POST',
+      headers: { Cookie: jar.header(), Origin: 'https://evil.example.com' },
+    });
+    expect(res.status).toBe(403);
+
+    // The session must still be valid - the forged logout must not have gone through.
+    const me = await apiFetch(jar, '/api/auth/me');
+    const meBody = await me.json();
+    expect(meBody.authenticated).toBe(true);
+  });
+
   it('does not CSRF-protect a plain GET (read-only route)', async () => {
     const jar = new CookieJar();
     await apiFetch(jar, '/api/auth/signup', {
