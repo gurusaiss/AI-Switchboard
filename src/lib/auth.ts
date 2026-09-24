@@ -9,10 +9,14 @@ export interface SessionData {
   email?: string;
 }
 
+// Shared with middleware.ts (which can't call getSession()/cookies() outside a
+// request-scoped context) so both read the same cookie under one name.
+export const SESSION_COOKIE_NAME = 'acp_session';
+
 export function sessionOptions(): SessionOptions {
   return {
     password: env.sessionSecret,
-    cookieName: 'acp_session',
+    cookieName: SESSION_COOKIE_NAME,
     cookieOptions: {
       secure: !env.insecureCookies,
       httpOnly: true,
