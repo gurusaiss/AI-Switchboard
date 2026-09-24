@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireSession } from '../../../../lib/auth';
 import { disconnectProvider } from '../../../../lib/providerService';
 import { jsonError, withErrorHandling } from '../../../../lib/api-helpers';
+import { assertSameOrigin } from '../../../../lib/csrf';
 
 export const DELETE = withErrorHandling(
-  async (_req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+  async (req: NextRequest, { params }: { params: Promise<{ id: string }> }) => {
+    assertSameOrigin(req);
     const { id } = await params;
     const { workspaceId } = await requireSession();
     const ok = await disconnectProvider(workspaceId, id);

@@ -4,6 +4,7 @@ import { requireSession } from '../../../../lib/auth';
 import { connectProvider } from '../../../../lib/providerService';
 import { jsonError, withErrorHandling } from '../../../../lib/api-helpers';
 import { safeLog } from '../../../../lib/redact';
+import { assertSameOrigin } from '../../../../lib/csrf';
 
 const bodySchema = z.object({
   provider: z.enum(['openai', 'anthropic', 'google', 'openrouter', 'ollama']),
@@ -11,6 +12,7 @@ const bodySchema = z.object({
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
+  assertSameOrigin(req);
   const { workspaceId } = await requireSession();
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
@@ -23,11 +25,12 @@ export const POST = withErrorHandling(async (req: NextRequest) => {
   }
 
   try {
-    const { id, discoveredModels } = await connectProvider(workspaceId, provider, apiKey);
+    const { id, discoveredModels, rotated } = await connectProvider(workspaceId, provider, apiKey);
     // Never echo the key back - only confirmation + what was discovered.
     return NextResponse.json({
       id,
       provider,
+      rotated,
       discoveredModels: discoveredModels.map((m) => ({
         id: m.id,
         displayName: m.displayName,

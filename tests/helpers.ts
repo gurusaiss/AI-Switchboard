@@ -33,6 +33,10 @@ export async function apiFetch(
     ...init,
     headers: {
       'Content-Type': 'application/json',
+      // A real browser always sends Origin on a same-origin fetch()/form POST;
+      // send it here too so these tests exercise the same-origin path the CSRF
+      // check expects (see tests/csrf.test.ts for the rejection cases).
+      Origin: BASE_URL,
       ...(init.headers || {}),
       Cookie: jar.header(),
     },

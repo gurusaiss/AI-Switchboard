@@ -6,6 +6,8 @@ import { getUsableModelIds, buildKeyResolver } from '../../../lib/providerServic
 import { getAdapter } from '../../../adapters';
 import { jsonError, withErrorHandling } from '../../../lib/api-helpers';
 import type { ProviderName } from '../../../lib/types';
+import { assertSameOrigin } from '../../../lib/csrf';
+import { executeRateLimiter } from '../../../lib/rateLimit';
 
 const bodySchema = z.object({
   prompt: z.string().min(1),
@@ -13,7 +15,9 @@ const bodySchema = z.object({
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
+  assertSameOrigin(req);
   const { workspaceId } = await requireSession();
+  executeRateLimiter.consume(workspaceId);
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message ?? 'Invalid input');

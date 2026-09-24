@@ -7,6 +7,8 @@ import { hashPassword, getSession } from '../../../../lib/auth';
 import { newId } from '../../../../lib/ids';
 import { generateDek, wrapDek, packEncrypted } from '../../../../lib/crypto';
 import { jsonError, withErrorHandling } from '../../../../lib/api-helpers';
+import { assertSameOrigin } from '../../../../lib/csrf';
+import { authRateLimiter, clientKey } from '../../../../lib/rateLimit';
 
 const bodySchema = z.object({
   email: z.string().email(),
@@ -15,6 +17,8 @@ const bodySchema = z.object({
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
+  assertSameOrigin(req);
+  authRateLimiter.consume(clientKey(req));
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message ?? 'Invalid input');

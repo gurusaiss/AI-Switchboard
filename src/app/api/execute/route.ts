@@ -9,6 +9,8 @@ import { newId } from '../../../lib/ids';
 import { jsonError, withErrorHandling } from '../../../lib/api-helpers';
 import { safeLog } from '../../../lib/redact';
 import { benchmarkCostFor } from '../../../lib/costBenchmark';
+import { assertSameOrigin } from '../../../lib/csrf';
+import { executeRateLimiter } from '../../../lib/rateLimit';
 
 const bodySchema = z.object({
   prompt: z.string().min(1),
@@ -18,7 +20,9 @@ const bodySchema = z.object({
 });
 
 export const POST = withErrorHandling(async (req: NextRequest) => {
+  assertSameOrigin(req);
   const { workspaceId } = await requireSession();
+  executeRateLimiter.consume(workspaceId);
   const parsed = bodySchema.safeParse(await req.json());
   if (!parsed.success) {
     return jsonError(parsed.error.issues[0]?.message ?? 'Invalid input');

@@ -16,7 +16,12 @@ export function sessionOptions(): SessionOptions {
     cookieOptions: {
       secure: !env.insecureCookies,
       httpOnly: true,
-      sameSite: 'lax',
+      // 'strict' means the session cookie is never sent on a cross-site request
+      // (including a top-level navigation from an attacker's page), which is the
+      // primary CSRF mitigation here. The Origin/Referer check in ./csrf.ts is a
+      // defense-in-depth backstop for state-changing routes - see its comment for
+      // why that combination is adequate for this stage.
+      sameSite: 'strict',
     },
   };
 }
