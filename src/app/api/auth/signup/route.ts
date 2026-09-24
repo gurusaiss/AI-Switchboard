@@ -11,7 +11,15 @@ import { assertSameOrigin } from '../../../../lib/csrf';
 import { authRateLimiter, clientKey } from '../../../../lib/rateLimit';
 
 const bodySchema = z.object({
-  email: z.string().email(),
+  // Normalized to lowercase so "User@Example.com" and "user@example.com" are
+  // treated as the same identity - this matches the same normalization on
+  // login below, and prevents case-variant duplicate accounts. SQLite's
+  // unique constraint on `email` is case-sensitive by default, so without
+  // this the "already exists" check below would miss case-variant dupes.
+  email: z
+    .string()
+    .email()
+    .transform((v) => v.trim().toLowerCase()),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   workspaceName: z.string().min(1).optional(),
 });

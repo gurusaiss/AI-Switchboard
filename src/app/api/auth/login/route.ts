@@ -9,7 +9,12 @@ import { assertSameOrigin } from '../../../../lib/csrf';
 import { authRateLimiter, clientKey } from '../../../../lib/rateLimit';
 
 const bodySchema = z.object({
-  email: z.string().email(),
+  // Same normalization as signup - lets a user log in regardless of the
+  // letter-casing they type, and matches the lowercase value stored at signup.
+  email: z
+    .string()
+    .email()
+    .transform((v) => v.trim().toLowerCase()),
   password: z.string().min(1),
 });
 

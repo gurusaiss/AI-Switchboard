@@ -38,6 +38,38 @@ describe('auth flow', () => {
     expect(second.status).toBe(409);
   });
 
+  it('rejects a duplicate signup that only differs by email letter-casing', async () => {
+    const jar = new CookieJar();
+    const email = uniqueEmail('CaseDupe');
+    await apiFetch(jar, '/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: 'correcthorsebatterystaple' }),
+    });
+    const second = await apiFetch(jar, '/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.toUpperCase(), password: 'anotherpassword123' }),
+    });
+    expect(second.status).toBe(409);
+  });
+
+  it('stores email lowercased and lets login match regardless of the case typed', async () => {
+    const jar = new CookieJar();
+    const email = uniqueEmail('MixedCase');
+    const signup = await apiFetch(jar, '/api/auth/signup', {
+      method: 'POST',
+      body: JSON.stringify({ email, password: 'correcthorsebatterystaple' }),
+    });
+    const signupBody = await signup.json();
+    expect(signupBody.user.email).toBe(email.toLowerCase());
+
+    const loginJar = new CookieJar();
+    const login = await apiFetch(loginJar, '/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify({ email: email.toUpperCase(), password: 'correcthorsebatterystaple' }),
+    });
+    expect(login.status).toBe(200);
+  });
+
   it('logs in with correct credentials and rejects a wrong password', async () => {
     const email = uniqueEmail('login');
     const signupJar = new CookieJar();
