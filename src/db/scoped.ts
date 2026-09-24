@@ -6,7 +6,6 @@ import {
   conversations,
   messages,
   usageEvents,
-  workspaceMembers,
   workspaces,
 } from './schema';
 
@@ -94,15 +93,4 @@ export function scopedQueries(workspaceId: string) {
     // -- workspace / membership --
     getWorkspace: () => db.select().from(workspaces).where(eq(workspaces.id, workspaceId)).then((r) => r[0]),
   };
-}
-
-/** Confirms a user is a member of a workspace before any scoped query runs. Throws if not. */
-export async function assertMembership(userId: string, workspaceId: string): Promise<void> {
-  const rows = await db
-    .select()
-    .from(workspaceMembers)
-    .where(and(eq(workspaceMembers.workspaceId, workspaceId), eq(workspaceMembers.userId, userId)));
-  if (rows.length === 0) {
-    throw new Error('Not a member of this workspace');
-  }
 }
