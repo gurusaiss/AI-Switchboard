@@ -196,8 +196,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"   # 
 # paste both into .env.local
 
 # Create the SQLite DB and seed the model registry:
-npx tsx scripts/migrate.ts
-npx tsx scripts/seed.ts
+npm run db:setup   # runs db:migrate then db:seed
 
 npm run dev
 # -> http://localhost:3000
