@@ -62,7 +62,7 @@ export default function LandingPage() {
           One box to type into. A routing engine that picks the model - and shows you why.
         </h1>
         <p className="mt-5 max-w-2xl text-lg text-muted">
-          AI Control Plane is a personal, bring-your-own-key control layer over the AI
+          AI Switchboard is a personal, bring-your-own-key control layer over the AI
           providers you already pay for. Type a request, and a task-aware routing engine
           picks which connected model should handle it, explains its reasoning, and lets
           you compare models side by side or fall back to a fully local, private model via
@@ -134,7 +134,7 @@ export default function LandingPage() {
         <div className="mx-auto max-w-6xl px-4 py-16 sm:px-6">
           <h2 className="text-2xl font-semibold text-ink">Where this is, honestly</h2>
           <p className="mt-3 max-w-2xl text-muted">
-            This is V1 of a personal AI control plane, built and used by one developer
+            This is V1 of AI Switchboard, a personal AI routing workspace, built and used by one developer
             first. It does not have agents, MCP tool integration, or team workspaces yet -
             those are real gaps, not hidden ones, and they're on the roadmap rather than in
             the product. What is here - BYOK, routing, explainability, Compare, local

@@ -38,7 +38,7 @@ export default function Nav() {
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-6">
           <Link href="/" className="font-semibold text-brand-700">
-            AI Control Plane
+            AI Switchboard
           </Link>
           <div className="hidden gap-1 text-sm sm:flex">
             {LINKS.map((l) => (

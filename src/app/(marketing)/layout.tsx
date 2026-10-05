@@ -7,7 +7,7 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <header className="border-b border-border bg-surface/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
           <Link href="/" className="text-lg font-semibold tracking-tight text-ink">
-            AI Control Plane
+            AI Switchboard
           </Link>
           <nav className="flex items-center gap-2 text-sm sm:gap-4">
             <Link href="/pricing" className="rounded px-2 py-1.5 text-muted hover:bg-bg hover:text-ink">
@@ -31,11 +31,11 @@ export default function MarketingLayout({ children }: { children: ReactNode }) {
       <footer className="border-t border-border">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-faint sm:px-6">
           <p>
-            AI Control Plane is an actively-built V1 - a personal, BYOK routing layer over
+            AI Switchboard is an actively-built V1 - a personal, BYOK routing layer over
             your own provider keys. No customer logos, no case studies, no simulated
             checkout - what's on this page is what's actually in the app.
           </p>
-          <p className="mt-3">© {new Date().getFullYear()} AI Control Plane.</p>
+          <p className="mt-3">© {new Date().getFullYear()} AI Switchboard.</p>
         </div>
       </footer>
     </div>

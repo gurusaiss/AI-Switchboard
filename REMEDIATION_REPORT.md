@@ -1,4 +1,4 @@
-# AI Control Plane — Remediation Report
+# AI Switchboard — Remediation Report
 
 Date: 2026-09-24
 Basis: `AUDIT_REPORT.md` (Prompt 1, completed same day) — Issue Registry section 17 ("Master Bug Inventory"), specifically the 3 open Low-severity findings (L4, L5, L6). No Critical/High/Medium items were open; the one Medium (M1) and three other Lows (L1–L3) were already fixed and tested before this pass began.

@@ -1,6 +1,6 @@
-# AI Control Plane (V1)
+# AI Switchboard (V1)
 
-A privacy-first, BYOK ("bring your own key") personal AI control plane. You type
+AI Switchboard is a privacy-first, BYOK ("bring your own key") AI routing workspace. You type
 one request into a universal composer; a task-aware routing engine picks which
 connected AI provider/model should handle it, shows you why, and lets you
 override, run manually, or compare models side by side.

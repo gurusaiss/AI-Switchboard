@@ -36,10 +36,10 @@ export default function LoginPage() {
   return (
     <div className="mx-auto mt-16 max-w-sm px-4">
       <Link href="/" className="text-sm font-medium text-brand-700">
-        AI Control Plane
+        AI Switchboard
       </Link>
       <h1 className="mb-1 mt-6 text-2xl font-semibold text-ink">Log in</h1>
-      <p className="mb-6 text-sm text-muted">Welcome back to your AI Control Plane.</p>
+      <p className="mb-6 text-sm text-muted">Welcome back to your AI Switchboard.</p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="mb-1 block text-sm font-medium text-ink">Email</label>

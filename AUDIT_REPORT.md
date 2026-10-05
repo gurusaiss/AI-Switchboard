@@ -1,4 +1,4 @@
-# AI Control Plane — Full-Stack Audit Report
+# AI Switchboard — Full-Stack Audit Report
 
 Date: 2026-09-24
 Auditor: Claude (automated audit agent), live browser QA via Playwright + Chromium, static code review, and the project's own Vitest integration suite.
